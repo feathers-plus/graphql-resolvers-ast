@@ -25,8 +25,8 @@ graphql-resolvers-ast provides context information for a resolver, including:
 - What operation is being performed, e.g. Query or Mutation.
 - Which resolver is running, e.g. [ 'Post', 'editor' ].
 - What is it resolving in the GraphQL operation, e.g. [ 'getUser', 'posts', 0, 'Post', 'editor' ].
-- What type of result is it to return, e.g. 'User' or '[User!]!'.
-- Which fields will GraphQL return, e.g. { kind: 'Field', name: 'email', hasSelections: false }
+- What type of result it is to return, e.g. 'User' or '[User!]!'.
+- Which fields from the result will GraphQL return.
 
 Information is returned on fragments if any. Overlapping fragments are handled.
 
