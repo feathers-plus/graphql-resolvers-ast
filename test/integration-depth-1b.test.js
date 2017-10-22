@@ -85,11 +85,11 @@ const expectedLog = {
       [
         { kind: 'Field', name: 'body', hasSelections: false },
         { kind: 'Field', name: 'draft', hasSelections: false },
-        { kind: 'Field', name: 'achieved', hasSelections: false },
+        { kind: 'Field', name: 'achieved', hasSelections: false }
       ]
     ],
     args: {},
-    fragments: {},
+    fragments: {}
   }],
   QueryGetUser: [{
     operation: 'Query',
@@ -103,7 +103,7 @@ const expectedLog = {
       ]
     ],
     args: { keyInt: 1, keyStr: 'a' },
-    fragments: {},
+    fragments: {}
   }],
   QueryGetPosts: []
 };
@@ -128,6 +128,6 @@ describe('integration-depth-1b.test.js', () => {
   });
 });
 
-function inspector(obj, depth) {
+function inspector (obj, depth) { // eslint-disable-line
   console.log(inspect(obj, { depth, colors: true }));
 }

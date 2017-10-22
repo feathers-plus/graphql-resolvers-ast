@@ -98,7 +98,7 @@ const expectedLog = {
       ]
     ],
     args: {},
-    fragments: {},
+    fragments: {}
   }],
   PostEditor: [
     {
@@ -140,7 +140,7 @@ const expectedLog = {
       ]
     ],
     args: { keyInt: 1, keyStr: 'a' },
-    fragments: {},
+    fragments: {}
   }],
   QueryGetPosts: []
 };
@@ -165,6 +165,6 @@ describe('integration-depth-2.test.js', () => {
   });
 });
 
-function inspector(obj, depth) {
+function inspector (obj, depth) { // eslint-disable-line
   console.log(inspect(obj, { depth, colors: true }));
 }

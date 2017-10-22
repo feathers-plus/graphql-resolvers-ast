@@ -99,7 +99,7 @@ const expectedLog = {
         name: 'PostFragment',
         hasSelections: true
       }
-    },
+    }
   }],
   QueryGetUser: [{
     operation: 'Query',
@@ -119,7 +119,7 @@ const expectedLog = {
         name: 'PostFragment',
         hasSelections: true
       }
-    },
+    }
   }],
   QueryGetPosts: []
 };
@@ -144,6 +144,6 @@ describe('integration-fragments.test.js', () => {
   });
 });
 
-function inspector(obj, depth) {
+function inspector (obj, depth) { // eslint-disable-line
   console.log(inspect(obj, { depth, colors: true }));
 }

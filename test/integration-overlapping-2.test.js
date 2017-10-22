@@ -92,7 +92,7 @@ const expectedResult = {
       email: '  email1@gmail.com ',
       posts: [
         { body: '  post1 ', draft: true, achieved: true },
-        { body: ' post2  ', draft: false, achieved: true },
+        { body: ' post2  ', draft: false, achieved: true }
       ]
     }
   }
@@ -107,7 +107,7 @@ const expectedLog = {
     fields: [
       [
         { kind: 'Field', name: 'body', hasSelections: false }
-        ],
+      ],
       [
         { kind: 'Field', name: 'draft', hasSelections: false }
       ],
@@ -125,9 +125,9 @@ const expectedLog = {
       GetUserFragment: {
         kind: 'FragmentDefinition',
         name: 'GetUserFragment',
-        hasSelections: true,
-      },
-    },
+        hasSelections: true
+      }
+    }
   }],
   PostEditor: [],
   QueryGetUser: [{
@@ -155,9 +155,9 @@ const expectedLog = {
       GetUserFragment: {
         kind: 'FragmentDefinition',
         name: 'GetUserFragment',
-        hasSelections: true,
-      },
-    },
+        hasSelections: true
+      }
+    }
   }],
   QueryGetPosts: []
 };
@@ -182,6 +182,6 @@ describe('integration-overlapping-2.test.js', () => {
   });
 });
 
-function inspector(obj, depth) {
+function inspector (obj, depth) { // eslint-disable-line
   console.log(inspect(obj, { depth, colors: true }));
 }

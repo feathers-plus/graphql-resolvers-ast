@@ -68,7 +68,7 @@ const expectedLog = {
       ]
     ],
     args: {},
-    fragments: {},
+    fragments: {}
   }],
   QueryGetUser: [{
     operation: 'Query',
@@ -82,7 +82,7 @@ const expectedLog = {
       ]
     ],
     args: { keyInt: 1, keyStr: 'a' },
-    fragments: {},
+    fragments: {}
   }]
 };
 
@@ -106,6 +106,6 @@ describe('integration-depth-1a.test.js', () => {
   });
 });
 
-function inspector(obj, depth) {
+function inspector (obj, depth) { // eslint-disable-line
   console.log(inspect(obj, { depth, colors: true }));
 }
