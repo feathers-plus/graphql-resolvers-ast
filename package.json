@@ -54,6 +54,8 @@
   "dependencies": {},
   "devDependencies": {
     "chai": "3.5.0",
+    "graphql": "0.11.7",
+    "graphql-tools": "2.5.1",
     "istanbul": "1.1.0-alpha.1",
     "mocha": "4.0.1",
     "semistandard": "11.0.0"
