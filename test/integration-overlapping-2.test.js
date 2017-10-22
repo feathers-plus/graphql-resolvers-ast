@@ -57,7 +57,6 @@ fragment GetUserFragment on User {
 const resolvers = {
   Post: {
     editor (parent, args, context, ast) {
-      console.log('aa');
       log.PostEditor.push(resolversAst(ast));
       return { name: 'John', email: 'editor@gmail.com' };
     }

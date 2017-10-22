@@ -16,10 +16,245 @@ npm install graphql-resolvers-ast --save
 
 ## Documentation
 
-Work in progress.
+GraphQL resolvers are not typically aware of the context in which they hnave been called.
+For example a resolver within User is not aware if the User data is needed for the post author,
+the author of a comment for that post, the User who is following another User, or the User
+who is being followed.
 
-## Complete Example
+graphql-resolvers-ast provides context information for a resolver, including:
+- What operation is being performed, e.g. Query or Mutation.
+- What schema is running for, e.g. [ 'Post', 'editor' ].
+- What is it resolving in the operation, e.g. [ 'getUser', 'posts', 0, 'Post', 'editor' ].
+- What type of result is it to return, e.g. 'User' or '[User!]!'.
+- Which fields will GraphQL return, e.g. { kind: 'Field', name: 'email', hasSelections: false }
 
+Information is returned on fragments if any. Overlapping fragments are handled properly.
+
+## Example
+
+```js
+const resolversAst = require('graphql-resolvers-ast');
+ 
+const resolvers = {
+    User: {
+      posts (parent, args, content, ast) {
+        const context = resolversAst(ast);
+        console.log(context);
+        return /* call backend server for appropriate posts */;
+      }
+    },
+};
+```
+            
+## Example of Query Not Using Fragments
+
+```js
+const typeDefs = `
+  type User {
+    email: String
+    posts: [Post!]
+  }
+  
+  type Post {
+    body: String
+    draft: Boolean
+    achieved: Boolean
+    editor: User
+  }
+  
+  type Query {
+    getUser (keyInt: Int, keyStr: String): User
+  }
+`;
+ 
+const query = `
+query {
+  getUser (keyInt: 1, keyStr: "a") {
+    email
+    posts {
+      body
+      editor {
+        email
+      }
+    }
+  }
+}
+`;
+ 
+const resolvers = {
+  Post: {
+    editor (parent, args, content, ast) {
+      const context = resolversAst(ast);
+      return { email: 'editor@gmail.com' };
+        /* resolvers.Post.editor is called twice for the query. The context values returned are:
+          { operation: 'Query',
+            schema: [ 'Post', 'editor' ],
+            resolverPath: [ 'getUser', 'posts', 0, 'Post', 'editor' ],
+            resolveTo: 'User',
+            fields: [
+              [{ kind: 'Field', name: 'email', hasSelections: false }]
+            ],
+            args: {},
+            fragments: {}
+          }
+        and
+          { operation: 'Query',
+            schema: [ 'Post', 'editor' ],
+            resolverPath: [ 'getUser', 'posts', 1, 'Post', 'editor' ],
+            resolveTo: 'User',
+            fields: [
+              [{ kind: 'Field', name: 'email', hasSelections: false }]
+            ],
+            args: {},
+            fragments: {}
+          }      
+        */
+    }
+  },
+  User: {
+    posts (parent, args, content, ast) {
+      const context = resolversAst(ast);
+      return [
+        { body: '  post1 ', draft: true, achieved: true },
+        { body: ' post2  ', draft: false, achieved: true }
+      ];
+      /* resolvers.User.posts is called once for this query. context contains:
+        { operation: 'Query',
+          schema: [ 'User', 'posts' ],
+          resolverPath: [ 'getUser', 'User', 'posts' ],
+          resolveTo: '[Post!]',
+          fields: [
+            [ { kind: 'Field', name: 'body', hasSelections: false },
+              { kind: 'Field', name: 'editor', hasSelections: true } ]
+          ],
+          args: {},
+          fragments: {}
+        }      
+      */
+    }
+  },
+  Query: {
+    getUser (parent, args, content, ast) {
+      const context = resolversAst(ast);
+      return { email: '  email1@gmail.com ' };
+      /* resolvers.Query.getUser is called once for this query. context contains:
+        { operation: 'Query',
+          schema: [ 'Query', 'getUser' ],
+          resolverPath: [ 'Query', 'getUser' ],
+          resolveTo: 'User',
+          fields: [
+            [ { kind: 'Field', name: 'email', hasSelections: false },
+              { kind: 'Field', name: 'posts', hasSelections: true } ]
+          ],
+          args: { keyInt: 1, keyStr: 'a' },
+          fragments: {}
+        }      
+      */
+    }
+  }
+};
+```
+
+## Example of Query Using Overlapping Fragments
+
+*Overlapping* fragments result in multiple `fields` entries.
+
+```js
+const query = `
+query {
+  getUser {
+    email
+    posts {
+      body
+    }
+  }
+  ... QueryFragment
+}
+ 
+fragment QueryFragment on Query {
+  getUser {
+    posts {
+      draft
+    }
+    ... GetUserFragment
+  }
+}
+ 
+fragment GetUserFragment on User {
+  posts {
+    achieved
+  }
+}`;
+ 
+const resolvers = {
+  User: {
+    posts (parent, args, content, ast) {
+      const context = resolversAst(ast);
+      return [
+        { body: '  post1 ', draft: true, achieved: true },
+        { body: ' post2  ', draft: false, achieved: true }
+      ];
+      /* resolvers.User.posts is called once for this query. context contains:
+        { operation: 'Query',
+          schema: [ 'User', 'posts' ],
+          resolverPath: [ 'getUser', 'User', 'posts' ],
+          resolveTo: '[Post!]',
+          fields: [
+            [ { kind: 'Field', name: 'body', hasSelections: false } ],
+            [ { kind: 'Field', name: 'draft', hasSelections: false } ],
+            [ { kind: 'Field', name: 'achieved', hasSelections: false } ]
+          ],
+          args: {},
+          fragments: {
+            QueryFragment: {
+              kind: 'FragmentDefinition',
+              name: 'QueryFragment',
+              hasSelections: true
+            },
+            GetUserFragment: {
+              kind: 'FragmentDefinition',
+              name: 'GetUserFragment',
+              hasSelections: true
+            }
+          }
+        }     
+      */
+    }
+  },
+  Query: {
+    getUser (parent, args, content, ast) {
+      const context = resolversAst(ast);
+      return { email: '  email1@gmail.com ' };
+      /* resolvers.Query.getUser is called once for this query. context contains:
+        { operation: 'Query',
+          schema: [ 'Query', 'getUser' ],
+          resolverPath: [ 'Query', 'getUser' ],
+          resolveTo: 'User',
+          fields: [
+            [ { kind: 'Field', name: 'email', hasSelections: false },
+              { kind: 'Field', name: 'posts', hasSelections: true } ],
+            [ { kind: 'Field', name: 'posts', hasSelections: true },
+              { kind: 'FragmentSpread', name: 'GetUserFragment', hasSelections: false } ]
+          ],
+          args: {},
+          fragments: {
+            QueryFragment: {
+              kind: 'FragmentDefinition',
+              name: 'QueryFragment',
+              hasSelections: true
+            },
+            GetUserFragment: {
+              kind: 'FragmentDefinition',
+              name: 'GetUserFragment',
+              hasSelections: true
+            }
+          }
+        }     
+      */
+    }
+  }
+};
+```
 
 ## License
 
