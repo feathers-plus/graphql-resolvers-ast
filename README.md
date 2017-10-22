@@ -6,7 +6,7 @@
 [![Dependency Status](https://img.shields.io/david/eddyystop/graphql-resolvers-ast.svg?style=flat-square)](https://david-dm.org/eddyystop/graphql-resolvers-ast)
 [![Download Status](https://img.shields.io/npm/dm/graphql-resolvers-ast.svg?style=flat-square)](https://www.npmjs.com/package/graphql-resolvers-ast)
 
-> Extract useful information from the AST param passed to the GraphQL resolver function.
+> Provide GraphQL resolver functions information about the context in which they have been invoked.
 
 ## Installation
 
@@ -16,19 +16,19 @@ npm install graphql-resolvers-ast --save
 
 ## Documentation
 
-GraphQL resolvers are not typically aware of the context in which they hnave been called.
-For example a resolver within User is not aware if the User data is needed for the post author,
-the author of a comment for that post, the User who is following another User, or the User
+GraphQL resolvers are not typically aware of the context in which they are running.
+For example a resolver within User is not aware if the data is needed for the post author,
+the author of a comment, the User who is following another User, or the User
 who is being followed.
 
 graphql-resolvers-ast provides context information for a resolver, including:
 - What operation is being performed, e.g. Query or Mutation.
-- What schema is running for, e.g. [ 'Post', 'editor' ].
-- What is it resolving in the operation, e.g. [ 'getUser', 'posts', 0, 'Post', 'editor' ].
+- Which resolver is running, e.g. [ 'Post', 'editor' ].
+- What is it resolving in the GraphQL operation, e.g. [ 'getUser', 'posts', 0, 'Post', 'editor' ].
 - What type of result is it to return, e.g. 'User' or '[User!]!'.
 - Which fields will GraphQL return, e.g. { kind: 'Field', name: 'email', hasSelections: false }
 
-Information is returned on fragments if any. Overlapping fragments are handled properly.
+Information is returned on fragments if any. Overlapping fragments are handled.
 
 ## Example
 
@@ -36,17 +36,17 @@ Information is returned on fragments if any. Overlapping fragments are handled p
 const resolversAst = require('graphql-resolvers-ast');
  
 const resolvers = {
-    User: {
-      posts (parent, args, content, ast) {
-        const context = resolversAst(ast);
-        console.log(context);
-        return /* call backend server for appropriate posts */;
-      }
-    },
+  User: {
+    posts (parent, args, content, ast) {
+      const context = resolversAst(ast);
+      console.log(context);
+      return /* call backend server for appropriate posts */;
+    }
+  },
 };
 ```
             
-## Example of Query Not Using Fragments
+## Example of a Query Without Fragments
 
 ```js
 const typeDefs = `
@@ -86,7 +86,7 @@ const resolvers = {
     editor (parent, args, content, ast) {
       const context = resolversAst(ast);
       return { email: 'editor@gmail.com' };
-        /* resolvers.Post.editor is called twice for the query. The context values returned are:
+        /* resolvers.Post.editor is called twice during the query. The context values returned are:
           { operation: 'Query',
             schema: [ 'Post', 'editor' ],
             resolverPath: [ 'getUser', 'posts', 0, 'Post', 'editor' ],
@@ -155,9 +155,9 @@ const resolvers = {
 };
 ```
 
-## Example of Query Using Overlapping Fragments
+## Example of a Query Using Overlapping Fragments
 
-*Overlapping* fragments result in multiple `fields` entries.
+*Overlapping* fragments result in multiple context.fields entries.
 
 ```js
 const query = `
