@@ -89,7 +89,7 @@ const resolvers = {
         /* resolvers.Post.editor is called twice during the query. The context values returned are:
           { operation: 'Query',
             schema: [ 'Post', 'editor' ],
-            resolverPath: [ 'getUser', 'posts', 0, 'Post', 'editor' ],
+            resolverPath: [ 'getUser', 'User', 'posts', 0, 'Post', 'editor', 'User' ],
             resolveTo: 'User',
             fields: [
               [{ kind: 'Field', name: 'email', hasSelections: false }]
@@ -100,7 +100,7 @@ const resolvers = {
         and
           { operation: 'Query',
             schema: [ 'Post', 'editor' ],
-            resolverPath: [ 'getUser', 'posts', 1, 'Post', 'editor' ],
+            resolverPath: [ 'getUser', 'User', 'posts', 1, 'Post', 'editor', 'User' ],
             resolveTo: 'User',
             fields: [
               [{ kind: 'Field', name: 'email', hasSelections: false }]
@@ -121,7 +121,7 @@ const resolvers = {
       /* resolvers.User.posts is called once for this query. context contains:
         { operation: 'Query',
           schema: [ 'User', 'posts' ],
-          resolverPath: [ 'getUser', 'User', 'posts' ],
+          resolverPath: [ 'getUser', 'User', 'posts', '[Post!]' ],
           resolveTo: '[Post!]',
           fields: [
             [ { kind: 'Field', name: 'body', hasSelections: false },
@@ -140,7 +140,7 @@ const resolvers = {
       /* resolvers.Query.getUser is called once for this query. context contains:
         { operation: 'Query',
           schema: [ 'Query', 'getUser' ],
-          resolverPath: [ 'Query', 'getUser' ],
+          resolverPath: [ 'getUser', 'User' ],
           resolveTo: 'User',
           fields: [
             [ { kind: 'Field', name: 'email', hasSelections: false },
