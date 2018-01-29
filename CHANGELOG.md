@@ -1,5 +1,8 @@
 # Change Log
 
+## [v1.1.0](https://github.com/eddyystop/graphql-resolvers-ast/tree/v1.1.0) (2018-01-29)
+[Full Changelog](https://github.com/eddyystop/graphql-resolvers-ast/compare/v1.0.0...v1.1.0)
+
 ## [v1.0.0](https://github.com/eddyystop/graphql-resolvers-ast/tree/v1.0.0) (2018-01-28)
 
 
